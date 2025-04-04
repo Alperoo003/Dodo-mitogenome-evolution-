@@ -1,12 +1,12 @@
 import os
 from Bio import SeqIO
 
-# 📁 Giriş ve çıkış klasörleri
+# 📁 Input and output folders
 input_folder = r"C:\Users\ASUS\Downloads\Dodo project\data.gb"
 output_folder = os.path.join(input_folder, "extracted_flight_genes")
 os.makedirs(output_folder, exist_ok=True)
 
-# 🎯 Hedef genler
+# 🎯 Target genes
 target_genes = {
     "coi": "COI",
     "cox1": "COI",
@@ -28,10 +28,9 @@ target_genes = {
     "coiii": "COIII",
     "cox3": "COIII",
     "cytochrome c oxidase subunit iii": "COIII"
-    
 }
 
-# 🧬 Çıktı dosyaları oluştur
+# 🧬 Create output files
 output_files = {
     "COI": open(os.path.join(output_folder, "COI_all_species.fasta"), "w"),
     "ND2": open(os.path.join(output_folder, "ND2_all_species.fasta"), "w"),
@@ -40,14 +39,14 @@ output_files = {
     "COIII": open(os.path.join(output_folder, "COIII_all_species.fasta"), "w")
 }
 
-# 🔁 GenBank dosyalarını gez
+# 🔁 Iterate over GenBank files
 for filename in os.listdir(input_folder):
     if filename.endswith(".gb"):
         filepath = os.path.join(input_folder, filename)
         try:
             record = SeqIO.read(filepath, "genbank")
         except Exception as e:
-            print(f"❌ {filename} okunamadı: {e}")
+            print(f"❌ Failed to read {filename}: {e}")
             continue
 
         species = record.annotations.get("organism", filename.replace(".gb", "")).replace(" ", "_")
@@ -67,17 +66,18 @@ for filename in os.listdir(input_folder):
                             fasta_entry = f">{species}_{gene_name}\n{seq}\n"
                             output_files[gene_name].write(fasta_entry)
                             found_genes.add(gene_name)
-                            print(f"✅ {gene_name} çıkarıldı: {species}")
+                            print(f"✅ Extracted {gene_name}: {species}")
                         except Exception as e:
-                            print(f"⚠️ {gene_name} çıkarılamadı ({species}): {e}")
+                            print(f"⚠️ Failed to extract {gene_name} ({species}): {e}")
                         break
 
-# 🔒 Dosyaları kapat
+# 🔒 Close all output files
 for f in output_files.values():
     f.close()
 
-print("\n🎉 5 hedef gen (COI, ND2, ND4, ND3, COIII) başarıyla çıkarıldı!")
-print("📂 Klasör: " + output_folder)
+print("\n🎉 Extraction complete! 5 target genes (COI, ND2, ND4, ND3, COIII) successfully extracted.")
+print("📂 Output folder: " + output_folder)
+
 
 
 
